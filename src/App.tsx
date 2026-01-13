@@ -27,13 +27,15 @@ function App() {
         size={350}
       />
 
-      {winner && (
-        <div className="mt-8 p-4 bg-gray-800 rounded-lg">
-          <p className="text-xl text-white">
-            You won: <span className="text-yellow-400 font-bold">{winner}</span>
-          </p>
-        </div>
-      )}
+      <div className="mt-8 p-4 bg-gray-800 rounded-lg min-w-[200px] text-center">
+        <p className="text-xl text-white">
+          {winner ? (
+            <>You won: <span className="text-yellow-400 font-bold">{winner}</span></>
+          ) : (
+            <span className="text-gray-500">Spin to play!</span>
+          )}
+        </p>
+      </div>
     </div>
   );
 }

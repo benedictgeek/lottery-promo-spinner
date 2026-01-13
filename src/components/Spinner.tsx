@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useClickSound } from '../hooks/useAudio';
+import pointerPinSvg from '../svg/pointer-pin.svg';
 
 export interface Segment {
   label: string;
@@ -72,25 +73,28 @@ export function Spinner({
     };
   }, []);
 
+  // Inner radius for segments (accounting for outer ring)
+  const innerRadius = radius - 15;
+
   // Create SVG arc path for a segment
   const createSegmentPath = (index: number): string => {
     const startAngle = (index * segmentAngle - 90) * (Math.PI / 180);
     const endAngle = ((index + 1) * segmentAngle - 90) * (Math.PI / 180);
 
-    const x1 = centerX + radius * Math.cos(startAngle);
-    const y1 = centerY + radius * Math.sin(startAngle);
-    const x2 = centerX + radius * Math.cos(endAngle);
-    const y2 = centerY + radius * Math.sin(endAngle);
+    const x1 = centerX + innerRadius * Math.cos(startAngle);
+    const y1 = centerY + innerRadius * Math.sin(startAngle);
+    const x2 = centerX + innerRadius * Math.cos(endAngle);
+    const y2 = centerY + innerRadius * Math.sin(endAngle);
 
     const largeArcFlag = segmentAngle > 180 ? 1 : 0;
 
-    return `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
+    return `M ${centerX} ${centerY} L ${x1} ${y1} A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
   };
 
   // Calculate text position for a segment
   const getTextPosition = (index: number) => {
     const angle = ((index + 0.5) * segmentAngle - 90) * (Math.PI / 180);
-    const textRadius = radius * 0.65;
+    const textRadius = innerRadius * 0.65;
     return {
       x: centerX + textRadius * Math.cos(angle),
       y: centerY + textRadius * Math.sin(angle),
@@ -169,13 +173,16 @@ export function Spinner({
         <div
           className="absolute left-1/2 z-10"
           style={{
-            top: -10,
-            transformOrigin: 'center bottom',
+            top: -20,
+            transformOrigin: 'center top',
             transform: `translateX(-50%) rotate(${pointerAngle}deg)`,
           }}
         >
-          <div
-            className="w-0 h-0 border-l-[15px] border-r-[15px] border-t-[25px] border-l-transparent border-r-transparent border-t-white drop-shadow-lg"
+          <img
+            src={pointerPinSvg}
+            alt="pointer"
+            className="drop-shadow-lg"
+            style={{ width: 40, height: 40 }}
           />
         </div>
 
@@ -189,15 +196,59 @@ export function Spinner({
             transform: `rotate(${rotation}deg)`,
           }}
         >
-          {/* Outer ring */}
+          {/* Gradient definitions */}
+          <defs>
+            <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#fbbf24" />
+              <stop offset="25%" stopColor="#f59e0b" />
+              <stop offset="50%" stopColor="#fbbf24" />
+              <stop offset="75%" stopColor="#d97706" />
+              <stop offset="100%" stopColor="#fbbf24" />
+            </linearGradient>
+            <linearGradient id="innerRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#1f2937" />
+              <stop offset="50%" stopColor="#374151" />
+              <stop offset="100%" stopColor="#1f2937" />
+            </linearGradient>
+          </defs>
+
+          {/* Outer decorative ring */}
           <circle
             cx={centerX}
             cy={centerY}
-            r={radius - 2}
+            r={radius - 5}
             fill="none"
-            stroke="#374151"
+            stroke="url(#ringGradient)"
+            strokeWidth="10"
+          />
+
+          {/* Inner border */}
+          <circle
+            cx={centerX}
+            cy={centerY}
+            r={radius - 12}
+            fill="none"
+            stroke="url(#innerRingGradient)"
             strokeWidth="4"
           />
+
+          {/* Decorative pegs/notches around the ring */}
+          {segments.map((_, index) => {
+            const angle = (index * segmentAngle - 90) * (Math.PI / 180);
+            const pegX = centerX + (radius - 5) * Math.cos(angle);
+            const pegY = centerY + (radius - 5) * Math.sin(angle);
+            return (
+              <circle
+                key={`peg-${index}`}
+                cx={pegX}
+                cy={pegY}
+                r={4}
+                fill="#fbbf24"
+                stroke="#d97706"
+                strokeWidth="1"
+              />
+            );
+          })}
 
           {/* Segments */}
           {segments.map((segment, index) => (
