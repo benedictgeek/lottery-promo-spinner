@@ -192,7 +192,7 @@ export function Spinner({
           width={size}
           height={size}
           className="cursor-pointer drop-shadow-2xl"
-          onClick={spin}
+          onClick={undefined}
           style={{
             transform: `rotate(${rotation}deg)`,
           }}

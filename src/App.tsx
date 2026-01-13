@@ -10,16 +10,24 @@ const defaultSegments: any[] = [
   { label: 'Mystery Prize', color: '#DDA0DD', image: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2753.png' }, // question
 ];
 
+interface WinnerInfo {
+  label: string;
+  image?: string;
+}
+
 function App() {
-  const [winner, setWinner] = useState<string | null>(null);
+  const [winnerInfo, setWinnerInfo] = useState<WinnerInfo | null>(null);
 
   const handleSpinEnd = (result: { label: string; index: number }) => {
-    setWinner(result.label);
+    const segment = defaultSegments[result.index];
+    setWinnerInfo({
+      label: result.label,
+      image: segment.image,
+    });
   };
 
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4">
-
       <Spinner
         segments={defaultSegments}
         onSpinEnd={handleSpinEnd}
@@ -29,13 +37,14 @@ function App() {
 
       <div className="mt-8 p-4 bg-gray-800 rounded-lg min-w-[200px] text-center">
         <p className="text-xl text-white">
-          {winner ? (
-            <>You won: <span className="text-yellow-400 font-bold">{winner}</span></>
+          {winnerInfo ? (
+            <>You won: <span className="text-yellow-400 font-bold">{winnerInfo.label}</span></>
           ) : (
             <span className="text-gray-500">Spin to play!</span>
           )}
         </p>
       </div>
+
     </div>
   );
 }
