@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { Spinner } from './components/Spinner';
 
 const defaultSegments: any[] = [
-  { label: '10% Off', color: '#FF6B6B' },
-  { label: 'Free Shipping', color: '#4ECDC4' },
-  { label: 'Try Again', color: '#45B7D1' },
-  { label: '$5 Credit', color: '#96CEB4' },
-  { label: '20% Off', color: '#FFEAA7' },
-  { label: 'Mystery Prize', color: '#DDA0DD' },
+  { label: '10% Off', color: '#FF6B6B', image: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f381.png' }, // gift
+  { label: 'Free Shipping', color: '#4ECDC4', image: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f69a.png' }, // truck
+  { label: 'Try Again', color: '#45B7D1', image: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f504.png' }, // refresh
+  { label: '$5 Credit', color: '#96CEB4', image: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4b5.png' }, // money
+  { label: '20% Off', color: '#FFEAA7', image: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2b50.png' }, // star
+  { label: 'Mystery Prize', color: '#DDA0DD', image: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2753.png' }, // question
 ];
 
 function App() {

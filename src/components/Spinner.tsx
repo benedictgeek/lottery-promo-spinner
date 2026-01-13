@@ -5,6 +5,7 @@ import pointerPinSvg from '../svg/pointer-pin.svg';
 export interface Segment {
   label: string;
   color: string;
+  image?: string;
 }
 
 interface SpinnerProps {
@@ -262,9 +263,26 @@ export function Spinner({
             </g>
           ))}
 
-          {/* Text labels */}
+          {/* Segment labels (image or text) */}
           {segments.map((segment, index) => {
             const pos = getTextPosition(index);
+            const imageSize = innerRadius * 0.35;
+
+            if (segment.image) {
+              return (
+                <image
+                  key={`image-${index}`}
+                  href={segment.image}
+                  x={pos.x - imageSize / 2}
+                  y={pos.y - imageSize / 2}
+                  width={imageSize}
+                  height={imageSize}
+                  transform={`rotate(${pos.rotation}, ${pos.x}, ${pos.y})`}
+                  style={{ pointerEvents: 'none' }}
+                />
+              );
+            }
+
             return (
               <text
                 key={`text-${index}`}
