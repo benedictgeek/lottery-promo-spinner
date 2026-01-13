@@ -21,20 +21,53 @@ export function Spinner({
 }: SpinnerProps) {
   const [rotation, setRotation] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
+  const [pointerAngle, setPointerAngle] = useState(0);
   const lastSegmentIndexRef = useRef(0);
   const animationRef = useRef<number | null>(null);
+  const pointerAnimationRef = useRef<number | null>(null);
   const { playClick } = useClickSound();
+
+  // Animate pointer bounce
+  const bouncePointer = useCallback(() => {
+    if (pointerAnimationRef.current) {
+      cancelAnimationFrame(pointerAnimationRef.current);
+    }
+
+    const startTime = performance.now();
+    const duration = 150;
+    const maxAngle = 15;
+
+    const animatePointer = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Spring-like bounce: quick deflection then return
+      const angle = maxAngle * Math.sin(progress * Math.PI) * (1 - progress);
+      setPointerAngle(angle);
+
+      if (progress < 1) {
+        pointerAnimationRef.current = requestAnimationFrame(animatePointer);
+      } else {
+        setPointerAngle(0);
+      }
+    };
+
+    pointerAnimationRef.current = requestAnimationFrame(animatePointer);
+  }, []);
 
   const segmentAngle = 360 / segments.length;
   const radius = size / 2;
   const centerX = radius;
   const centerY = radius;
 
-  // Cleanup animation on unmount
+  // Cleanup animations on unmount
   useEffect(() => {
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
+      }
+      if (pointerAnimationRef.current) {
+        cancelAnimationFrame(pointerAnimationRef.current);
       }
     };
   }, []);
@@ -99,6 +132,7 @@ export function Spinner({
 
       if (currentSegmentIndex !== lastSegmentIndexRef.current) {
         playClick();
+        bouncePointer();
         lastSegmentIndexRef.current = currentSegmentIndex;
       }
 
@@ -125,7 +159,7 @@ export function Spinner({
     };
 
     animationRef.current = requestAnimationFrame(animate);
-  }, [isSpinning, rotation, segments, segmentAngle, spinDuration, playClick, onSpinEnd]);
+  }, [isSpinning, rotation, segments, segmentAngle, spinDuration, playClick, bouncePointer, onSpinEnd]);
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -133,8 +167,12 @@ export function Spinner({
       <div className="relative" style={{ width: size, height: size }}>
         {/* Pointer */}
         <div
-          className="absolute left-1/2 -translate-x-1/2 z-10"
-          style={{ top: -10 }}
+          className="absolute left-1/2 z-10"
+          style={{
+            top: -10,
+            transformOrigin: 'center bottom',
+            transform: `translateX(-50%) rotate(${pointerAngle}deg)`,
+          }}
         >
           <div
             className="w-0 h-0 border-l-[15px] border-r-[15px] border-t-[25px] border-l-transparent border-r-transparent border-t-white drop-shadow-lg"
